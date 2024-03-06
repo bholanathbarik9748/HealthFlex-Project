@@ -9,16 +9,20 @@ import ReportComponent from "../Report/Report";
 import ForecastComponents from "../Forecast/Forecast";
 
 const SearchBar = () => {
-  const [Search, setSearch] = useState("");
-  const [Location, SetLocation] = useState({});
-  const [Current, SetCurrent] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [Forecast, setForecast] = useState({});
+  // State variables
+  const [Search, setSearch] = useState(""); // For storing search query
+  const [Location, SetLocation] = useState({}); // For storing location data
+  const [Current, SetCurrent] = useState({}); // For storing current weather data
+  const [loading, setLoading] = useState(false); // For managing loading state
+  const [Forecast, setForecast] = useState({}); // For storing forecast data
+  const [latlong, setLatLong] = useState({ latitude: "", longitude: "" }); // For latitude and longitude
 
+  // Function to handle input change
   const onChangeHandler = (events) => {
     setSearch(events.target.value);
   };
 
+  // Function to fetch location and current weather data
   const FetchData = async () => {
     try {
       setLoading(true);
@@ -31,10 +35,14 @@ const SearchBar = () => {
     }
   };
 
-  const getForecast = async (Search) => {
+  // Function to fetch forecast data
+  const getForecast = async () => {
     try {
       setLoading(true);
-      const response = await getForecastWeather(Search);
+      const response = await getForecastWeather(
+        latlong.latitude,
+        latlong.longitude
+      );
       setForecast(response);
       setLoading(false);
     } catch (error) {
@@ -42,6 +50,7 @@ const SearchBar = () => {
     }
   };
 
+  // Effect hook to get user's current location on component mount
   useEffect(() => {
     const getLocation = () => {
       if (navigator.geolocation) {
@@ -49,6 +58,10 @@ const SearchBar = () => {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             getCityName(position.coords.latitude, position.coords.longitude);
+            setLatLong({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            });
           },
           (error) => {
             console.error("Error getting current location:", error);
@@ -76,11 +89,13 @@ const SearchBar = () => {
     getLocation();
   }, []);
 
+  // Effect hook to fetch data whenever search query changes
   useEffect(() => {
     FetchData();
     getForecast(Search);
   }, [Search]);
 
+  // Render
   return (
     <>
       <div className="container" style={{ margin: "auto" }}>

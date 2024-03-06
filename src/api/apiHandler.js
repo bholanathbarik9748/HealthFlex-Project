@@ -42,11 +42,13 @@ export const getCityNameHandler = async (latitude, longitude) => {
   }
 };
 
-export const getForecastWeather = async (city) => {
-  
+export const getForecastWeather = async (lat, long) => {
+  if (!lat || !long) {
+    return {};
+  }
   try {
     const response = await axios.get(
-      `https://api.tomorrow.io/v4/timelines?location=${city}&fields=temperature&timesteps=1h&units=metric&apikey=dNAMcZvkkfEjeE8GUc2EYMa9O3zZpnVD`
+      `https://api.tomorrow.io/v4/timelines?location=${lat},${long}&fields=temperature&timesteps=1h&units=metric&apikey=SPemJ3dNVioPoDgNq23qfDmTRowYGEP2`
     );
     return response;
   } catch (error) {
